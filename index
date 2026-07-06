@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMLOKER — Politeknik ATMI Surakarta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1b2027;
+    --panel: #242b35;
+    --panel-2: #2c3542;
+    --line: #3a4351;
+    --text: #e9edf2;
+    --muted: #8b96a5;
+    --amber: #f2a900;
+    --amber-dark: #c48800;
+    --green: #3fa34d;
+    --green-dark: #2c7a37;
+    --red: #d64545;
+    --red-dark: #a83232;
+    --radius: 6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0) 0 0/22px 22px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .screen{display:none;min-height:100vh;flex-direction:column;}
+  .screen.active{display:flex;}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;border-bottom:1px solid var(--line);
+    background:rgba(0,0,0,0.15);
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .mark{
+    width:34px;height:34px;border:2px solid var(--amber);border-radius:4px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Oswald';font-weight:700;color:var(--amber);font-size:14px;
+    transform:rotate(-2deg);
+  }
+  .brand .title{font-family:'Oswald';font-weight:600;letter-spacing:0.06em;font-size:16px;}
+  .brand .title small{display:block;font-family:'Inter';font-weight:400;letter-spacing:0;color:var(--muted);font-size:11px;}
+  .btn-ghost{
+    background:none;border:1px solid var(--line);color:var(--muted);
+    padding:8px 14px;border-radius:var(--radius);font-family:'Inter';font-size:13px;cursor:pointer;
+  }
+  .btn-ghost:hover{border-color:var(--amber);color:var(--amber);}
+  .content{flex:1;display:flex;flex-direction:column;align-items:center;padding:40px 20px;}
+  .stage{width:100%;max-width:760px;}
+
+  /* HOME */
+  .hero{
+    width:100%;max-width:920px;margin-top:10px;
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;
+    background:var(--panel);
+  }
+  .hero-art{
+    height:260px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,#232a34 0%,#1a1f26 100%);
+  }
+  .hero-art svg{width:100%;height:100%;display:block;}
+  .hero-body{padding:34px 36px 38px;}
+  .eyebrow{
+    font-family:'JetBrains Mono';font-size:12px;color:var(--amber);
+    letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;
+  }
+  h1.hero-title{
+    font-family:'Oswald';font-weight:700;font-size:34px;line-height:1.15;margin:0 0 12px;
+  }
+  .hero-desc{color:var(--muted);font-size:15px;line-height:1.6;margin:0 0 28px;max-width:560px;}
+  .choice-row{display:flex;gap:16px;flex-wrap:wrap;}
+  .choice-card{
+    flex:1;min-width:220px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:var(--radius);padding:22px;cursor:pointer;text-align:left;
+    transition:border-color .15s, transform .15s;
+  }
+  .choice-card:hover{border-color:var(--amber);transform:translateY(-2px);}
+  .choice-card .num{font-family:'JetBrains Mono';color:var(--muted);font-size:12px;}
+  .choice-card h3{font-family:'Oswald';margin:8px 0 6px;font-size:20px;font-weight:600;}
+  .choice-card p{color:var(--muted);font-size:13px;margin:0;line-height:1.5;}
+  .choice-card .arrow{color:var(--amber);font-family:'JetBrains Mono';margin-top:14px;font-size:13px;}
+
+  /* FORM ELEMENTS */
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:32px 34px;width:100%;
+  }
+  .panel h2{font-family:'Oswald';font-weight:600;font-size:24px;margin:0 0 6px;}
+  .panel .sub{color:var(--muted);font-size:13px;margin:0 0 26px;}
+  .field{margin-bottom:18px;}
+  .field label{
+    display:block;font-size:12px;color:var(--muted);margin-bottom:6px;
+    letter-spacing:0.03em;text-transform:uppercase;font-family:'JetBrains Mono';
+  }
+  .field input, .field select{
+    width:100%;background:#1a1f26;border:1px solid var(--line);color:var(--text);
+    padding:11px 13px;border-radius:var(--radius);font-family:'Inter';font-size:14px;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--amber);}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .actions{display:flex;justify-content:space-between;align-items:center;margin-top:28px;}
+  .btn-primary{
+    background:var(--amber);color:#1a1206;border:none;font-weight:700;
+    padding:12px 26px;border-radius:var(--radius);cursor:pointer;font-family:'Inter';font-size:14px;
+  }
+  .btn-primary:hover{background:var(--amber-dark);}
+  .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-text{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;}
+  .btn-text:hover{color:var(--text);}
+  .error-msg{color:var(--red);font-size:13px;margin-top:6px;display:none;}
+
+  /* LAB LIST */
+  .lab-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  .lab-card{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  }
+  .lab-card:hover{border-color:var(--amber);}
+  .lab-card .name{font-family:'Oswald';font-weight:600;font-size:15px;}
+  .lab-card .count{font-family:'JetBrains Mono';font-size:12px;color:var(--muted);}
+
+  /* LOCKER GRID */
+  .legend{display:flex;gap:20px;margin-bottom:20px;font-size:12px;color:var(--muted);align-items:center;}
+  .legend .dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:6px;}
+  .locker-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:12px;
+    margin-bottom:8px;
+  }
+  .locker{
+    aspect-ratio: 3/4;
+    border-radius:5px;position:relative;cursor:pointer;
+    border:1px solid rgba(0,0,0,0.3);
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    padding-bottom:8px;
+    transition:transform .1s;
+  }
+  .locker:hover{transform:translateY(-2px);}
+  .locker.kosong{background:linear-gradient(180deg,var(--green) 0%, var(--green-dark) 100%);}
+  .locker.terisi{background:linear-gradient(180deg,var(--red) 0%, var(--red-dark) 100%);cursor:default;}
+  .locker.terisi:hover{transform:none;}
+  .locker.selected{outline:3px solid var(--amber);outline-offset:2px;}
+  .locker .handle{
+    position:absolute;top:14%;right:14%;width:5px;height:34%;
+    background:rgba(0,0,0,0.35);border-radius:2px;
+  }
+  .locker .plate{
+    background:rgba(0,0,0,0.28);border-radius:3px;padding:3px 6px;
+    font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:#fff;
+  }
+  .locker .status-label{font-size:9px;color:rgba(255,255,255,0.85);margin-top:2px;font-family:'Inter';}
+
+  /* BOOKING */
+  .shift-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .shift-opt{
+    border:1px solid var(--line);background:var(--panel-2);border-radius:var(--radius);
+    padding:12px;cursor:pointer;text-align:center;font-size:13px;
+  }
+  .shift-opt.active{border-color:var(--amber);background:rgba(242,169,0,0.1);color:var(--amber);}
+
+  /* THANKS */
+  .thanks-wrap{text-align:center;padding:60px 20px;}
+  .thanks-wrap .check{
+    width:64px;height:64px;border-radius:50%;border:2px solid var(--green);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 22px;color:var(--green);font-size:30px;
+  }
+  .receipt{
+    text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 22px;margin:26px auto 0;max-width:420px;font-size:13px;
+  }
+  .receipt div{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);}
+  .receipt div:last-child{border-bottom:none;}
+  .receipt span:first-child{color:var(--muted);}
+  .receipt span:last-child{font-family:'JetBrains Mono';}
+
+  /* MODAL (instructor detail) */
+  .modal-backdrop{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);
+    align-items:center;justify-content:center;z-index:50;
+  }
+  .modal-backdrop.active{display:flex;}
+  .modal{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    width:100%;max-width:420px;padding:26px 28px;
+  }
+  .modal h3{font-family:'Oswald';margin:0 0 4px;font-size:19px;}
+  .modal .sub{color:var(--muted);font-size:12px;margin:0 0 18px;font-family:'JetBrains Mono';}
+  .modal .kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .modal .kv span:first-child{color:var(--muted);}
+  .modal-close{margin-top:20px;width:100%;}
+
+  .back-link{color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:18px;display:inline-block;}
+  .back-link:hover{color:var(--amber);}
+  .loading-note{color:var(--muted);font-size:13px;text-align:center;padding:40px;}
+
+  @media (max-width:640px){
+    .row-2{grid-template-columns:1fr;}
+    .lab-grid{grid-template-columns:1fr;}
+    .choice-row{flex-direction:column;}
+    h1.hero-title{font-size:26px;}
+    .hero-art{height:180px;}
+    .shift-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HOME ============ -->
+<div class="screen active" id="screen-home">
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark">A</div>
+      <div class="title">SIMLOKER<small>Politeknik ATMI Surakarta</small></div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="hero">
+      <div class="hero-art">
+        <svg viewBox="0 0 920 260" preserveAspectRatio="xMidYMid slice">
+          <rect width="920" height="260" fill="#1e242c"/>
+          <g opacity="0.9">
+            <rect x="0" y="150" width="920" height="110" fill="#262e38"/>
+            <rect x="40" y="60" width="240" height="190" fill="#2a323d"/>
+            <rect x="300" y="30" width="330" height="220" fill="#2f3946"/>
+            <rect x="650" y="80" width="230" height="170" fill="#2a323d"/>
+            <g fill="#f2a900" opacity="0.55">
+              <rect x="330" y="60" width="26" height="34"/>
+              <rect x="374" y="60" width="26" height="34"/>
+              <rect x="418" y="60" width="26" height="34"/>
+              <rect x="462" y="60" width="26" height="34"/>
+              <rect x="506" y="60" width="26" height="34"/>
+              <rect x="550" y="60" width="26" height="34"/>
+              <rect x="330" y="110" width="26" height="34"/>
+              <rect x="374" y="110" width="26" height="34"/>
+              <rect x="462" y="110" width="26" height="34"/>
+              <rect x="550" y="110" width="26" height="34"/>
+              <rect x="70" y="90" width="30" height="40" opacity="0.35"/>
+              <rect x="120" y="90" width="30" height="40"/>
+              <rect x="170" y="90" width="30" height="40" opacity="0.35"/>
+              <rect x="690" y="110" width="28" height="36"/>
+              <rect x="740" y="110" width="28" height="36" opacity="0.35"/>
+              <rect x="790" y="110" width="28" height="36"/>
+            </g>
+            <rect x="440" y="170" width="60" height="80" fill="#1a1f26"/>
+            <text x="470" y="20" font-family="Oswald" font-size="13" fill="#8b96a5" text-anchor="middle" letter-spacing="2">GEDUNG PRAKTEK — KAMPUS ATMI</text>
+          </g>
+        </svg>
+      </div>
+      <div class="hero-body">
+        <div class="eyebrow">Sistem Informasi Loker Bengkel &amp; Laboratorium</div>
+        <h1 class="hero-title">Setiap loker, tercatat.<br>Setiap pengguna, jelas.</h1>
+        <p class="hero-desc">Pantau status loker di setiap lab dan bengkel praktek — siapa yang memakai, kapan, dan sampai kapan — supaya tidak ada lagi loker rusak tanpa identitas yang bisa ditelusuri.</p>
+        <div class="choice-row">
+          <div class="choice-card" onclick="goTo('screen-student-form')">
+            <div class="num">01</div>
+            <h3>Mahasiswa</h3>
+            <p>Isi identitas, pilih lab/bengkel, dan reservasi loker untuk sesi praktekmu.</p>
+            <div class="arrow">Masuk sebagai mahasiswa →</div>
+          </div>
+          <div class="choice-card" onclick="goTo('screen-instructor-login')">
+            <div class="num">02</div>
+            <h3>Instruktur</h3>
+            <p>Pantau status loker di lab yang kamu bimbing dan lihat identitas penggunanya.</p>
+            <div class="arrow">Masuk sebagai instruktur →</div>
+          </div>
+          <div class="choice-card" onclick="goTo('screen-cancel-lookup')">
+            <div class="num">03</div>
+            <h3>Batalkan Booking</h3>
+            <p>Sudah tidak jadi pakai loker? Cari booking kamu lewat NIM dan batalkan sendiri.</p>
+            <div class="arrow">Batalkan booking loker →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STUDENT: FORM IDENTITAS ============ -->
+<div class="screen" id="screen-student-form">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title">SIMLOKER<small>Formulir Mahasiswa</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Batal</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <div class="panel">
+        <h2>Identitas Mahasiswa</h2>
+        <p class="sub">Data ini akan tersimpan pada loker yang kamu pilih.</p>
+        <div class="row-2">
+          <div class="field"><label>Nama Lengkap</label><input id="st-nama" placeholder="mis. Bagas Prasetyo"></div>
+          <div class="field"><label>NIM</label><input id="st-nim" class="mono" placeholder="mis. 231234"></div>
+        </div>
+        <div class="row-2">
+          <div class="field"><label>Rombel</label><input id="st-rombel" placeholder="mis. MDA1"></div>
+          <div class="field"><label>No. Punch</label><input id="st-punch" class="mono" placeholder="mis. 045"></div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>Tingkat</label>
+            <select id="st-tingkat">
+              <option value="">Pilih tingkat</option>
+              <option>Tingkat 1</option><option>Tingkat 2</option>
+              <option>Tingkat 3</option><option>Tingkat 4</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Program Studi</label>
+            <select id="st-prodi">
+              <option value="">Pilih prodi</option>
+              <option>TMK</option>
+              <option>TRMK</option>
+              <option>TMI</option>
+              <option>RTM</option>
+              <option>PM</option>
+              <option>TPM</option>
+            </select>
+          </div>
+        </div>
+        <div class="error-msg" id="st-form-error">Lengkapi semua data terlebih dahulu.</div>
+        <div class="actions">
+          <span></span>
+          <button class="btn-primary" onclick="submitStudentForm()">Lanjut pilih lab →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STUDENT: PILIH LAB ============ -->
+<div class="screen" id="screen-student-lab">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title">SIMLOKER<small>Pilih Lab / Bengkel</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Batal</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <span class="back-link" onclick="goTo('screen-student-form')">← Kembali ke identitas</span>
+      <div class="panel">
+        <h2>Pilih Lab / Bengkel Praktek</h2>
+        <p class="sub">Pilih tempat kamu akan praktek hari ini.</p>
+        <div class="lab-grid" id="student-lab-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STUDENT: LOCKER GRID ============ -->
+<div class="screen" id="screen-student-lockers">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title" id="student-locker-title">SIMLOKER<small>Pilih Loker</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Batal</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <span class="back-link" onclick="goTo('screen-student-lab')">← Kembali pilih lab</span>
+      <div class="panel">
+        <h2 id="student-lockers-heading">Loker</h2>
+        <p class="sub">Klik loker berwarna hijau untuk memilihnya. Identitas pengguna loker lain disembunyikan.</p>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--green)"></span>Kosong</span>
+          <span><span class="dot" style="background:var(--red)"></span>Terisi</span>
+        </div>
+        <div class="locker-grid" id="student-locker-grid"></div>
+        <div class="actions">
+          <span class="mono" id="student-selected-info" style="color:var(--muted);font-size:13px;"></span>
+          <button class="btn-primary" id="student-continue-btn" disabled onclick="goTo('screen-student-booking')">Lanjut isi jadwal →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STUDENT: BOOKING JADWAL ============ -->
+<div class="screen" id="screen-student-booking">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title">SIMLOKER<small>Jadwal Penggunaan</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Batal</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <span class="back-link" onclick="goTo('screen-student-lockers')">← Kembali pilih loker</span>
+      <div class="panel">
+        <h2>Jadwal Penggunaan Loker</h2>
+        <p class="sub" id="booking-sub">Tentukan periode dan waktu penggunaan loker.</p>
+        <div class="row-2">
+          <div class="field"><label>Tanggal Mulai</label><input type="date" id="bk-tgl-mulai"></div>
+          <div class="field"><label>Tanggal Selesai</label><input type="date" id="bk-tgl-selesai"></div>
+        </div>
+        <div class="field">
+          <label>Shift</label>
+          <div class="shift-row">
+            <div class="shift-opt" data-shift="Pagi" onclick="pickShift(this,'08:00','15:15')">Pagi<br><span class="mono" style="font-size:11px;">08.00–15.15</span></div>
+            <div class="shift-opt" data-shift="Malam" onclick="pickShift(this,'14:45','22:00')">Malam<br><span class="mono" style="font-size:11px;">14.45–22.00</span></div>
+            <div class="shift-opt" data-shift="Penuh" onclick="pickShift(this,'08:00','17:00')">Penuh<br><span class="mono" style="font-size:11px;">08.00–17.00</span></div>
+          </div>
+        </div>
+        <div class="error-msg" id="bk-error">Lengkapi tanggal dan pilih shift terlebih dahulu.</div>
+        <div class="actions">
+          <span></span>
+          <button class="btn-primary" onclick="submitBooking()">Simpan &amp; Selesai →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STUDENT: THANKS ============ -->
+<div class="screen" id="screen-student-thanks">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title">SIMLOKER<small>Terima Kasih</small></div></div>
+  </div>
+  <div class="content">
+    <div class="stage thanks-wrap">
+      <div class="check">✓</div>
+      <h2 style="font-family:'Oswald';font-size:24px;margin:0 0 6px;">Loker berhasil didaftarkan</h2>
+      <p style="color:var(--muted);font-size:14px;">Terima kasih sudah mengisi data penggunaan loker. Jaga kerapian dan tanggung jawab terhadap loker yang sudah kamu pakai ya!</p>
+      <div class="receipt" id="thanks-receipt"></div>
+      <div style="margin-top:28px;">
+        <button class="btn-primary" onclick="goHome()">Kembali ke Beranda</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INSTRUCTOR: LOGIN ============ -->
+<div class="screen" id="screen-instructor-login">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title">SIMLOKER<small>Login Instruktur</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Batal</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <div class="panel">
+        <h2>Identitas Instruktur</h2>
+        <p class="sub">Masuk untuk memantau loker di lab yang kamu bimbing.</p>
+        <div class="row-2">
+          <div class="field"><label>Nama Instruktur</label><input id="ins-nama" placeholder="mis. Bpk. Sutrisno"></div>
+          <div class="field">
+            <label>Pembimbing Lab / Bengkel</label>
+            <select id="ins-lab"></select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Password Instruktur</label>
+          <input type="password" id="ins-password" class="mono" placeholder="Masukkan password (12345678)">
+        </div>
+        <div class="error-msg" id="ins-error">Nama, lab, dan password wajib diisi dengan benar.</div>
+        <div class="actions">
+          <span></span>
+          <button class="btn-primary" onclick="submitInstructorLogin()">Masuk →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INSTRUCTOR: PILIH LAB PANTAU ============ -->
+<div class="screen" id="screen-instructor-lab">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title">SIMLOKER<small id="ins-topbar-name">Instruktur</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Keluar</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <div class="panel">
+        <h2>Pilih Lab untuk Dipantau</h2>
+        <p class="sub">Kamu dapat memantau lab manapun, tidak terbatas pada lab bimbinganmu.</p>
+        <div class="lab-grid" id="instructor-lab-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INSTRUCTOR: LOCKER MONITOR ============ -->
+<div class="screen" id="screen-instructor-lockers">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title" id="instructor-locker-title">SIMLOKER<small>Pantau Loker</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Keluar</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <span class="back-link" onclick="goTo('screen-instructor-lab')">← Kembali pilih lab</span>
+      <div class="panel">
+        <h2 id="instructor-lockers-heading">Loker</h2>
+        <p class="sub">Klik loker merah untuk melihat identitas mahasiswa yang memakainya.</p>
+        <div class="legend" style="justify-content:space-between;">
+          <span style="display:flex;gap:20px;">
+            <span><span class="dot" style="background:var(--green)"></span>Kosong</span>
+            <span><span class="dot" style="background:var(--red)"></span>Terisi (klik untuk detail)</span>
+          </span>
+          <button class="btn-ghost" onclick="renderInstructorLockerGrid()">↻ Perbarui data</button>
+        </div>
+        <div class="locker-grid" id="instructor-locker-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CANCEL: LOOKUP NIM ============ -->
+<div class="screen" id="screen-cancel-lookup">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title">SIMLOKER<small>Batalkan Booking</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Batal</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <div class="panel">
+        <h2>Cari Booking Loker Kamu</h2>
+        <p class="sub">Masukkan NIM untuk menemukan loker yang sedang kamu pakai di semua lab/bengkel.</p>
+        <div class="field"><label>NIM</label><input id="cancel-nim" class="mono" placeholder="mis. 231234"></div>
+        <div class="error-msg" id="cancel-lookup-error">Masukkan NIM terlebih dahulu.</div>
+        <div class="actions">
+          <span></span>
+          <button class="btn-primary" onclick="lookupBookings()">Cari Booking →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CANCEL: LIST BOOKING ============ -->
+<div class="screen" id="screen-cancel-list">
+  <div class="topbar">
+    <div class="brand"><div class="mark">A</div><div class="title">SIMLOKER<small>Booking Ditemukan</small></div></div>
+    <button class="btn-ghost" onclick="goHome()">Selesai</button>
+  </div>
+  <div class="content">
+    <div class="stage">
+      <span class="back-link" onclick="goTo('screen-cancel-lookup')">← Cari NIM lain</span>
+      <div class="panel">
+        <h2>Booking Loker Kamu</h2>
+        <p class="sub" id="cancel-list-sub">Klik "Batalkan" untuk mengosongkan loker yang tidak jadi kamu pakai.</p>
+        <div id="cancel-list-body"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal">
+    <div class="sub" id="modal-lockernum">LOKER —</div>
+    <h3 id="modal-title">Detail Pengguna</h3>
+    <div id="modal-body"></div>
+    <button class="btn-primary modal-close" onclick="closeModal()">Tutup</button>
+  </div>
+</div>
+
+<script>
+// ============ DATA LABS ============
+const LABS = [
+  {id:"inka", name:"Lab INKA", jumlah:12},
+  {id:"ikl", name:"Lab IKL", jumlah:12},
+  {id:"gkl", name:"Lab GKL", jumlah:12},
+  {id:"kom", name:"Lab KOM", jumlah:12},
+  {id:"cam", name:"Lab CAM", jumlah:12},
+  {id:"scada", name:"Lab SCADA", jumlah:12},
+  {id:"bw", name:"Bengkel BW", jumlah:48},
+  {id:"lw", name:"Bengkel LW", jumlah:24},
+  {id:"mw", name:"Bengkel MW", jumlah:24},
+  {id:"md", name:"Bengkel MD", jumlah:48},
+  {id:"bwm", name:"Bengkel BWM", jumlah:12},
+];
+
+const INSTRUCTOR_PASSWORD = "12345678";
+const STORAGE_KEY = "simloker_data";
+
+// ============ STATE ============
+let state = {
+  student: {},
+  studentLab: null,
+  selectedLockerNo: null,
+  bookingShift: null,
+  bookingStart: '',
+  bookingEnd: '',
+  instructor: {},
+  instructorLab: null,
+  cancelNim: null,
+};
+
+// ============ STORAGE FUNCTIONS ============
+function initLockerData(){
+  const fresh = {};
+  LABS.forEach(l=>{
+    fresh[l.id] = [];
+    for(let i=1;i<=l.jumlah;i++){
+      fresh[l.id].push({
+        no: i, 
+        status: 'kosong', 
+        mahasiswa: null, 
+        tanggalMulai: null, 
+        tanggalSelesai: null, 
+        jamMulai: null, 
+        jamSelesai: null, 
+        shift: null
+      });
+    }
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+  return fresh;
+}
+
+function loadLockerData(){
+  try{
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if(stored){
+      const data = JSON.parse(stored);
+      // Release expired lockers
+      const today = new Date().toISOString().slice(0,10);
+      let changed = false;
+      Object.keys(data).forEach(labId=>{
+        data[labId].forEach(loc=>{
+          if(loc.status === 'terisi' && loc.tanggalSelesai && loc.tanggalSelesai < today){
+            loc.status = 'kosong';
+            loc.mahasiswa = null;
+            loc.tanggalMulai = null;
+            loc.tanggalSelesai = null;
+            loc.jamMulai = null;
+            loc.jamSelesai = null;
+            loc.shift = null;
+            changed = true;
+          }
+        });
+      });
+      if(changed){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+      return data;
+    }
+  }catch(e){
+    console.error('Gagal memuat data loker:', e);
+  }
+  return initLockerData();
+}
+
+function saveLockerData(data){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    return true;
+  }catch(e){ 
+    console.error("Storage error:", e);
+    return false;
+  }
+}
+
+// ============ NAVIGATION ============
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  
+  if(id === 'screen-student-lab') renderStudentLabGrid();
+  if(id === 'screen-instructor-lab') renderInstructorLabGrid();
+  if(id === 'screen-student-booking'){
+    document.querySelectorAll('.shift-opt').forEach(o=>o.classList.remove('active'));
+    document.getElementById('bk-tgl-mulai').value = '';
+    document.getElementById('bk-tgl-selesai').value = '';
+    document.getElementById('bk-error').style.display = 'none';
+    state.bookingShift = null;
+    state.bookingStart = '';
+    state.bookingEnd = '';
+  }
+}
+
+function goHome(){
+  state = {
+    student: {},
+    studentLab: null,
+    selectedLockerNo: null,
+    bookingShift: null,
+    bookingStart: '',
+    bookingEnd: '',
+    instructor: {},
+    instructorLab: null,
+    cancelNim: null,
+  };
+  goTo('screen-home');
+}
+
+// ============ STUDENT FORM ============
+function submitStudentForm(){
+  const nama = document.getElementById('st-nama').value.trim();
+  const nim = document.getElementById('st-nim').value.trim();
+  const rombel = document.getElementById('st-rombel').value.trim();
+  const punch = document.getElementById('st-punch').value.trim();
+  const tingkat = document.getElementById('st-tingkat').value;
+  const prodi = document.getElementById('st-prodi').value;
+  const err = document.getElementById('st-form-error');
+  
+  if(!nama || !nim || !rombel || !punch || !tingkat || !prodi){
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  state.student = {nama, nim, rombel, punch, tingkat, prodi};
+  goTo('screen-student-lab');
+}
+
+// ============ STUDENT LAB GRID ============
+function renderStudentLabGrid(){
+  const grid = document.getElementById('student-lab-grid');
+  grid.innerHTML = LABS.map(l => `
+    <div class="lab-card" onclick="chooseStudentLab('${l.id}')">
+      <div><div class="name">${l.name}</div></div>
+      <div class="count">${l.jumlah} loker</div>
+    </div>
+  `).join('');
+}
+
+function chooseStudentLab(labId){
+  state.studentLab = labId;
+  state.selectedLockerNo = null;
+  renderStudentLockerGrid();
+  goTo('screen-student-lockers');
+}
+
+// ============ STUDENT LOCKER GRID ============
+function renderStudentLockerGrid(){
+  const lab = LABS.find(l=>l.id===state.studentLab);
+  document.getElementById('student-lockers-heading').textContent = `Loker — ${lab.name}`;
+  const grid = document.getElementById('student-locker-grid');
+  
+  const data = loadLockerData();
+  const lockers = data[state.studentLab];
+  
+  grid.innerHTML = lockers.map(loc => {
+    const cls = loc.status === 'terisi' ? 'terisi' : 'kosong';
+    const sel = (state.selectedLockerNo === loc.no) ? ' selected' : '';
+    return `<div class="locker ${cls}${sel}" data-no="${loc.no}" onclick="pickStudentLocker(${loc.no})">
+        <div class="handle"></div>
+        <div class="plate">${String(loc.no).padStart(2,'0')}</div>
+        <div class="status-label">${loc.status === 'terisi' ? 'Terisi' : 'Kosong'}</div>
+      </div>`;
+  }).join('');
+  
+  updateStudentContinueState();
+}
+
+function pickStudentLocker(no){
+  document.querySelectorAll('#student-locker-grid .locker').forEach(el=>{
+    el.classList.remove('selected');
+  });
+  
+  const el = document.querySelector(`#student-locker-grid .locker[data-no="${no}"]`);
+  if(el.classList.contains('terisi')) return;
+  
+  el.classList.add('selected');
+  state.selectedLockerNo = no;
+  updateStudentContinueState();
+}
+
+function updateStudentContinueState(){
+  const info = document.getElementById('student-selected-info');
+  const btn = document.getElementById('student-continue-btn');
+  if(state.selectedLockerNo){
+    info.textContent = `Loker terpilih: #${String(state.selectedLockerNo).padStart(2,'0')}`;
+    btn.disabled = false;
+  } else {
+    info.textContent = '';
+    btn.disabled = true;
+  }
+}
+
+// ============ BOOKING ============
+function pickShift(el, start, end){
+  document.querySelectorAll('.shift-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  state.bookingShift = el.dataset.shift;
+  state.bookingStart = start;
+  state.bookingEnd = end;
+}
+
+function submitBooking(){
+  const tglMulai = document.getElementById('bk-tgl-mulai').value;
+  const tglSelesai = document.getElementById('bk-tgl-selesai').value;
+  const err = document.getElementById('bk-error');
+  
+  if(!tglMulai || !tglSelesai || !state.bookingShift){
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+
+  const data = loadLockerData();
+  const lockers = data[state.studentLab];
+  const target = lockers.find(l=>l.no === state.selectedLockerNo);
+  
+  if(!target || target.status === 'terisi'){
+    err.textContent = 'Loker ini baru saja dipakai orang lain, silakan pilih loker lain.';
+    err.style.display = 'block';
+    renderStudentLockerGrid();
+    return;
+  }
+  
+  target.status = 'terisi';
+  target.mahasiswa = {...state.student};
+  target.tanggalMulai = tglMulai;
+  target.tanggalSelesai = tglSelesai;
+  target.jamMulai = state.bookingStart;
+  target.jamSelesai = state.bookingEnd;
+  target.shift = state.bookingShift;
+  
+  saveLockerData(data);
+
+  const lab = LABS.find(l=>l.id===state.studentLab);
+  document.getElementById('thanks-receipt').innerHTML = `
+    <div><span>Lab / Bengkel</span><span>${lab.name}</span></div>
+    <div><span>Nomor Loker</span><span>#${String(target.no).padStart(2,'0')}</span></div>
+    <div><span>Nama</span><span>${state.student.nama}</span></div>
+    <div><span>NIM</span><span>${state.student.nim}</span></div>
+    <div><span>Periode</span><span>${tglMulai} s/d ${tglSelesai}</span></div>
+    <div><span>Waktu</span><span>${state.bookingStart} - ${state.bookingEnd} (${state.bookingShift})</span></div>
+  `;
+  goTo('screen-student-thanks');
+}
+
+// ============ INSTRUCTOR ============
+function initInstructorLabSelect(){
+  const sel = document.getElementById('ins-lab');
+  sel.innerHTML = '<option value="">Pilih lab bimbingan</option>' +
+    LABS.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+}
+
+function submitInstructorLogin(){
+  const nama = document.getElementById('ins-nama').value.trim();
+  const lab = document.getElementById('ins-lab').value;
+  const pass = document.getElementById('ins-password').value;
+  const err = document.getElementById('ins-error');
+  
+  if(!nama || !lab || pass !== INSTRUCTOR_PASSWORD){
+    err.textContent = !nama || !lab ? 'Nama dan lab bimbingan wajib diisi.' : 'Password salah. Gunakan: 12345678';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  state.instructor = {nama, lab};
+  document.getElementById('ins-topbar-name').textContent = `${nama} — Pembimbing ${LABS.find(l=>l.id===lab).name}`;
+  goTo('screen-instructor-lab');
+}
+
+function renderInstructorLabGrid(){
+  const grid = document.getElementById('instructor-lab-grid');
+  grid.innerHTML = LABS.map(l => `
+    <div class="lab-card" onclick="chooseInstructorLab('${l.id}')">
+      <div><div class="name">${l.name}</div></div>
+      <div class="count">${l.jumlah} loker</div>
+    </div>
+  `).join('');
+}
+
+function chooseInstructorLab(labId){
+  state.instructorLab = labId;
+  renderInstructorLockerGrid();
+  goTo('screen-instructor-lockers');
+}
+
+function renderInstructorLockerGrid(){
+  const lab = LABS.find(l=>l.id===state.instructorLab);
+  document.getElementById('instructor-lockers-heading').textContent = `Loker — ${lab.name}`;
+  const grid = document.getElementById('instructor-locker-grid');
+  
+  const data = loadLockerData();
+  const lockers = data[state.instructorLab];
+  
+  grid.innerHTML = lockers.map(loc => {
+    const cls = loc.status === 'terisi' ? 'terisi' : 'kosong';
+    const clickAttr = loc.status === 'terisi' ? `onclick="showLockerDetail(${loc.no})"` : '';
+    return `<div class="locker ${cls}" data-no="${loc.no}" ${clickAttr}>
+        <div class="handle"></div>
+        <div class="plate">${String(loc.no).padStart(2,'0')}</div>
+        <div class="status-label">${loc.status === 'terisi' ? 'Terisi' : 'Kosong'}</div>
+      </div>`;
+  }).join('');
+}
+
+function showLockerDetail(no){
+  const data = loadLockerData();
+  const loc = data[state.instructorLab].find(l=>l.no===no);
+  if(!loc || loc.status !== 'terisi') return;
+  
+  const m = loc.mahasiswa;
+  document.getElementById('modal-lockernum').textContent = `LOKER #${String(no).padStart(2,'0')}`;
+  document.getElementById('modal-title').textContent = m.nama;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="kv"><span>NIM</span><span class="mono">${m.nim}</span></div>
+    <div class="kv"><span>Rombel</span><span class="mono">${m.rombel}</span></div>
+    <div class="kv"><span>No. Punch</span><span class="mono">${m.punch}</span></div>
+    <div class="kv"><span>Tingkat</span><span>${m.tingkat}</span></div>
+    <div class="kv"><span>Prodi</span><span>${m.prodi}</span></div>
+    <div class="kv"><span>Periode</span><span class="mono">${loc.tanggalMulai} s/d ${loc.tanggalSelesai}</span></div>
+    <div class="kv"><span>Waktu / Shift</span><span class="mono">${loc.jamMulai}-${loc.jamSelesai} (${loc.shift})</span></div>
+  `;
+  document.getElementById('modal-backdrop').classList.add('active');
+}
+
+function closeModal(){
+  document.getElementById('modal-backdrop').classList.remove('active');
+}
+
+// ============ CANCEL BOOKING ============
+function lookupBookings(){
+  const nim = document.getElementById('cancel-nim').value.trim();
+  const err = document.getElementById('cancel-lookup-error');
+  if(!nim){
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  state.cancelNim = nim;
+  renderCancelList();
+  goTo('screen-cancel-list');
+}
+
+function renderCancelList(){
+  const body = document.getElementById('cancel-list-body');
+  const data = loadLockerData();
+  const nim = state.cancelNim;
+  const found = [];
+  
+  LABS.forEach(l=>{
+    data[l.id].forEach(loc=>{
+      if(loc.status === 'terisi' && loc.mahasiswa && loc.mahasiswa.nim === nim){
+        found.push({lab:l, loc});
+      }
+    });
+  });
+  
+  document.getElementById('cancel-list-sub').textContent =
+    found.length === 0
+      ? `Tidak ditemukan booking aktif untuk NIM ${nim}.`
+      : `Ditemukan ${found.length} booking aktif untuk NIM ${nim}. Klik "Batalkan" untuk mengosongkan loker.`;
+
+  if(found.length === 0){
+    body.innerHTML = `<div class="loading-note">Cek kembali NIM yang kamu masukkan, atau mungkin loker sudah pernah dikosongkan / masa pakainya sudah habis.</div>`;
+    return;
+  }
+
+  body.innerHTML = found.map(f => `
+    <div class="lab-card" style="cursor:default;margin-bottom:12px;align-items:flex-start;">
+      <div style="flex:1;">
+        <div class="name">${f.lab.name} — Loker #${String(f.loc.no).padStart(2,'0')}</div>
+        <div class="count" style="margin-top:6px;line-height:1.6;">
+          ${f.loc.mahasiswa.nama}<br>
+          Periode: ${f.loc.tanggalMulai} s/d ${f.loc.tanggalSelesai}<br>
+          Waktu: ${f.loc.jamMulai}-${f.loc.jamSelesai} (${f.loc.shift})
+        </div>
+      </div>
+      <button class="btn-primary" style="background:var(--red);color:#fff;flex-shrink:0;padding:8px 16px;font-size:12px;" onclick="cancelBooking('${f.lab.id}', ${f.loc.no})">Batalkan</button>
+    </div>
+  `).join('');
+}
+
+function cancelBooking(labId, no){
+  const data = loadLockerData();
+  const loc = data[labId].find(l=>l.no===no);
+  if(!loc || !loc.mahasiswa || loc.mahasiswa.nim !== state.cancelNim){
+    alert('Booking ini sudah tidak berlaku atau NIM tidak cocok.');
+    renderCancelList();
+    return;
+  }
+  loc.status = 'kosong';
+  loc.mahasiswa = null;
+  loc.tanggalMulai = null;
+  loc.tanggalSelesai = null;
+  loc.jamMulai = null;
+  loc.jamSelesai = null;
+  loc.shift = null;
+  saveLockerData(data);
+  renderCancelList();
+}
+
+// ============ INIT ============
+initInstructorLabSelect();
+
+// Initialize data if not exists
+if(!localStorage.getItem(STORAGE_KEY)){
+  initLockerData();
+}
+</script>
+</body>
+</html>l
